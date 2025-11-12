@@ -52,27 +52,24 @@ def create_behavior_tree(ra):
     #{'x': -227.483, 'y': -394.018, 'z': 278.261, 'rx': -110.224, 'ry': -90.0, 'rz': 170.224}
     # home = Cartesian(-227.483, -394.018, 278.261, -110.224, -90.0, 170.224)
     home = Cartesian(0,0,0,0,0,0)
-    desired_pos = Cartesian(home.x, home.y, home.z, home.rx, home.ry, home.rz)
+    home = Cartesian(home.x, home.y, home.z, home.rx, home.ry, home.rz)
     
     cube_size = 200
     
     corners = [
         # Move in bottom plane
-        Cartesian(desired_pos.x, desired_pos.y, desired_pos.z, desired_pos.rx, desired_pos.ry, desired_pos.rz),
-        Cartesian(desired_pos.x, desired_pos.y, desired_pos.z + cube_size, desired_pos.rx, desired_pos.ry, desired_pos.rz),
-        Cartesian(desired_pos.x - cube_size, desired_pos.y, desired_pos.z + cube_size, desired_pos.rx, desired_pos.ry, desired_pos.rz),
-        Cartesian(desired_pos.x - cube_size, desired_pos.y, desired_pos.z, desired_pos.rx, desired_pos.ry, desired_pos.rz),
-        Cartesian(desired_pos.x, desired_pos.y, desired_pos.z, desired_pos.rx, desired_pos.ry, desired_pos.rz),
+        Cartesian(home.x, home.y, home.z, home.rx, home.ry, home.rz),
+        Cartesian(home.x, home.y, home.z + cube_size, home.rx, home.ry, home.rz),
+        Cartesian(home.x - cube_size, home.y, home.z + cube_size, home.rx, home.ry, home.rz),
+        Cartesian(home.x - cube_size, home.y, home.z, home.rx, home.ry, home.rz),
+        Cartesian(home.x, home.y, home.z, home.rx, home.ry, home.rz),
         
         # Move in top plane
-        Cartesian(desired_pos.x, desired_pos.y + cube_size, desired_pos.z, desired_pos.rx, desired_pos.ry, desired_pos.rz),
-        Cartesian(desired_pos.x, desired_pos.y + cube_size, desired_pos.z + cube_size, desired_pos.rx, desired_pos.ry, desired_pos.rz),
-        Cartesian(desired_pos.x - cube_size, desired_pos.y + cube_size, desired_pos.z + cube_size, desired_pos.rx, desired_pos.ry, desired_pos.rz),
-        Cartesian(desired_pos.x - cube_size, desired_pos.y + cube_size, desired_pos.z, desired_pos.rx, desired_pos.ry, desired_pos.rz),
-        Cartesian(desired_pos.x, desired_pos.y + cube_size, desired_pos.z, desired_pos.rx, desired_pos.ry, desired_pos.rz),
-        
-        
-        
+        Cartesian(home.x, home.y + cube_size, home.z, home.rx, home.ry, home.rz),
+        Cartesian(home.x, home.y + cube_size, home.z + cube_size, home.rx, home.ry, home.rz),
+        Cartesian(home.x - cube_size, home.y + cube_size, home.z + cube_size, home.rx, home.ry, home.rz),
+        Cartesian(home.x - cube_size, home.y + cube_size, home.z, home.rx, home.ry, home.rz),
+        Cartesian(home.x, home.y + cube_size, home.z, home.rx, home.ry, home.rz),
     ]
     # Create sequence for rectangle drawing
     rectangle_sequence = py_trees.composites.Sequence("DrawRectangle", memory=True)
@@ -97,8 +94,7 @@ def create_behavior_tree(ra):
     # Main sequence
     root = py_trees.composites.Sequence("Main", memory=True)
     root.add_children([
-        MoveLinear("MoveToHome", ra, home),
-        MoveLinear("MoveToStart", ra, desired_pos),
+        MoveLinear("MoveToStart", ra, home),
         parallel
     ])
     
