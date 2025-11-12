@@ -1,5 +1,6 @@
 from .tcp import Tcp
 from .ra_error import *
+from .position import Cartesian
 
 class RobotArm:
     def __init__(self, host):
@@ -46,13 +47,18 @@ class RobotArm:
         self._validate(reply)
 
     # ---------------- Motion Control ----------------
+    def set_kinematic_coordinate(self, cartesian: Cartesian):
+        msg = f"SetKinematicCoordinate,0,{cartesian.x},{cartesian.y},{cartesian.z},{cartesian.rx},{cartesian.ry},{cartesian.rz},;"
+        reply = self.tcp.send(msg)
+        self._validate(reply)
+
     def move_joint(self, jPos):
         msg = f"MoveJ,0,{jPos.j1},{jPos.j2},{jPos.j3},{jPos.j4},{jPos.j5},{jPos.j6},;"
         reply = self.tcp.send(msg)
         self._validate(reply)
 
-    def move_linear(self, x, y, z, rx, ry, rz):
-        msg = f"MoveL,0,{x},{y},{z},{rx},{ry},{rz},;"
+    def move_linear(self, cartesian: Cartesian):
+        msg = f"MoveL,0,{cartesian.x},{cartesian.y},{cartesian.z},{cartesian.rx},{cartesian.ry},{cartesian.rz},;"
         reply = self.tcp.send(msg)
         self._validate(reply)
 
@@ -104,7 +110,7 @@ class RobotArm:
         reply = self.tcp.send("ReadPcsActualPos,0,;")
         self._validate(reply)
         values = reply.split(',')
-        return [float(v) for v in values[2:8]]
+        return Cartesian(*[float(v) for v in values[2:8]])
 
     def read_state(self):
         reply = self.tcp.send("ReadRobotState,0,;")
