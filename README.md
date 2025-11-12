@@ -68,15 +68,24 @@ https://github.com/user-attachments/assets/2d68cb86-ef7f-4fea-a627-f24f3eff14fd
 https://github.com/user-attachments/assets/7c20f3c5-21eb-4f37-bf2b-a7959f07ce7f
 
 ## Project Structure
-
-- `robot_arm/`: Core library modules
-  - `robot_arm.py`: Main RobotArm class
-  - `tcp.py`: TCP communication
-  - `position.py`: Position data structures
-  - `ra_error.py`: Error handling
-- `MoveInCube.py`: Example behavior tree for moving in a cube pattern
-- `pour_wine.py`: Example wine pouring task
-- `main.py`: Simple hello world script
+```
+├── Reference/
+├── robot_arm/
+│   ├── __init__.py
+│   ├── position.py     # Position data structures
+│   ├── ra_error.py     # Error handling
+│   ├── robot_arm.py    # Main RobotArm class
+│   └── tcp.py          # TCP communication
+├── Tree/
+├── .gitignore
+├── .python-version
+├── MoveInCube.py       # Example behavior tree for moving in a cube pattern
+├── main.py             # Simple hello world script
+├── pour_wine.py        # Example wine pouring task
+├── pyproject.toml      # Project configuration
+├── README.md           # This file
+└── uv.lock
+```
 
 ## Protocol Reference
 
