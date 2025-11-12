@@ -1,78 +1,155 @@
 from .tcp import Tcp
 from .ra_error import *
 
-class RobotArm():
+class RobotArm:
     def __init__(self, host):
         self.tcp = Tcp(host)
-    
-    def _validate(self, reply): #check if error raised
+
+    def _validate(self, reply):
+        values = reply.split(',')
+        if len(values) < 2:
+            raise RAError(f"Received invalid response: {reply}")
+        if values[1] != 'OK':
+            raise RAError(f"Received error: {reply}")
+
+    # ---------------- Core System Control ----------------
+    def power_on(self):
+        reply = self.tcp.send("Electrify,;")
+        self._validate(reply)
+
+    def power_off(self):
+        reply = self.tcp.send("BlackOut,;")
+        self._validate(reply)
+
+    def start_master(self):
+        reply = self.tcp.send("StartMaster,;")
+        self._validate(reply)
+
+    def close_master(self):
+        reply = self.tcp.send("CloseMaster,;")
+        self._validate(reply)
+
+    def servo_on(self):
+        reply = self.tcp.send("GrpPowerOn,0,;")
+        self._validate(reply)
+
+    def servo_off(self):
+        reply = self.tcp.send("GrpPowerOff,0,;")
+        self._validate(reply)
+
+    def stop(self):
+        reply = self.tcp.send("GrpStop,0,;")
+        self._validate(reply)
+
+    def reset(self):
+        reply = self.tcp.send("GrpReset,0,;")
+        self._validate(reply)
+
+    # ---------------- Motion Control ----------------
+    def move_joint(self, jPos):
+        msg = f"MoveJ,0,{jPos.j1},{jPos.j2},{jPos.j3},{jPos.j4},{jPos.j5},{jPos.j6},;"
+        reply = self.tcp.send(msg)
+        self._validate(reply)
+
+    def move_linear(self, x, y, z, rx, ry, rz):
+        msg = f"MoveL,0,{x},{y},{z},{rx},{ry},{rz},;"
+        reply = self.tcp.send(msg)
+        self._validate(reply)
+
+    def move_home(self):
+        reply = self.tcp.send("MoveHoming,0,;")
+        self._validate(reply)
+
+    def move_relative_joint(self, direction_id, direction, distance):
+        msg = f"MoveRelJ,0,{direction_id},{direction},{distance},;"
+        reply = self.tcp.send(msg)
+        self._validate(reply)
+
+    def move_relative_linear(self, direction_id, direction, distance):
+        msg = f"MoveRelL,0,{direction_id},{direction},{distance},;"
+        reply = self.tcp.send(msg)
+        self._validate(reply)
+
+    def is_moving(self):
+        reply = self.tcp.send("ReadMoveState,0,;")
+        self._validate(reply)
+        if "1009" in reply:
+            return True
+        if "0" in reply:
+            return False
+        raise RAError(f"Unexpected motion state: {reply}")
+
+    # ---------------- Speed Control ----------------
+    def set_speed(self, speed: float):
+        msg = f"SetOverride,0,{speed},;"
+        reply = self.tcp.send(msg)
+        self._validate(reply)
+
+    def get_speed(self) -> float:
+        reply = self.tcp.send("ReadOverride,0,;")
+        self._validate(reply)
         values = reply.split(',')
         if len(values) < 3:
-            raise RAError('Received invalid response (' + reply + ')')
-        if values[1] != 'OK':
-            raise RAError('Received invalid response (' + reply + ')')
+            raise RAError("Invalid ReadOverride response")
+        return float(values[2])
 
-    def isMoving(self):
-        reply = self.tcp.send('ReadMoveState,0,;')
-        self._validate(reply)
-        if reply == 'ReadMoveState,OK,1009,;':
-            return True #return 1009 while it is moving
-        if reply == 'ReadMoveState,OK,0,;':
-            return False #return 0 while stopped
-        raise RAError()
-
-    def moveJoint(self, jPos):
-        msg = 'MoveJ,0,' \
-            + str(jPos.j1) + ',' + str(jPos.j2) + ',' \
-            + str(jPos.j3) + ',' + str(jPos.j4) + ',' \
-            + str(jPos.j5) + ',' + str(jPos.j6) + ',;'
-        reply = self.tcp.send(msg)
-        self._validate(reply)
-    
-    def setSpeed(
-        self,
-        speed: float
-    ):
-        msg = 'SetOverride,0,' \
-            + str(speed) + ',;'
-        reply = self.tcp.send(msg)
-        self._validate(reply)
-
-    def getSpeed(
-        self
-    ) -> float:
-        msg = 'ReadOverride,0,;'
-        reply = self.tcp.send(msg)
+    # ---------------- Position Reading ----------------
+    def read_joint_pos(self):
+        reply = self.tcp.send("ReadAcsActualPos,0,;")
         self._validate(reply)
         values = reply.split(',')
-        if len(values) < 4:
-            raise RAError('Received invalid response.')
-        return values[2]
-        
+        return [float(v) for v in values[2:8]]
+
+    def read_cartesian_pos(self):
+        reply = self.tcp.send("ReadPcsActualPos,0,;")
+        self._validate(reply)
+        values = reply.split(',')
+        return [float(v) for v in values[2:8]]
+
+    def read_state(self):
+        reply = self.tcp.send("ReadRobotState,0,;")
+        self._validate(reply)
+        return reply.split(',')
+
+    # ---------------- IO Control ----------------
+    def set_output_io(self, io_index, state):
+        msg = f"SetOutIOState,0,{io_index},{state},;"
+        reply = self.tcp.send(msg)
+        self._validate(reply)
+
+    def read_input_io(self, io_index):
+        msg = f"ReadInIOState,0,{io_index},;"
+        reply = self.tcp.send(msg)
+        self._validate(reply)
+        return int(reply.split(',')[2])
+
+    def read_output_io(self, io_index):
+        msg = f"ReadOutIOState,0,{io_index},;"
+        reply = self.tcp.send(msg)
+        self._validate(reply)
+        return int(reply.split(',')[2])
+
+    # ---------------- Gripper ----------------
     def clamp(self, n, minn, maxn):
         return max(min(maxn, n), minn)
 
-    def moveGripper(self, position, speed=250, force=10):
-        self.clamp(position,0,140)
-        self.clamp(speed,30,250)
-        self.clamp(force,10,125)
-        msg = 'SetRobotiq,' + str(position) + ',' + str(speed) + ',' + str(force) + ',;'
+    def move_gripper(self, position, speed=250, force=10):
+        position = self.clamp(position, 0, 140)
+        speed = self.clamp(speed, 30, 250)
+        force = self.clamp(force, 10, 125)
+        msg = f"SetRobotiq,{position},{speed},{force},;"
         reply = self.tcp.send(msg)
         self._validate(reply)
-    
-    def resetGripper(self):
-        msg = 'RobotIQReset,;'
-        reply = self.tcp.send(msg)
-        self._validate(reply) #check if error raised
-        print(reply)
 
-    def isGripperMoving(self):
-        reply = self.tcp.send('RobotiqStatus,;')
+    def reset_gripper(self):
+        reply = self.tcp.send("RobotIQReset,;")
         self._validate(reply)
-        if reply == 'RobotiqStatus,OK,0,3,1,1,;':
-            return True #return True while its moving
-        if reply == 'RobotiqStatus,OK,2,3,1,1,;':
-            return False #return True while it is grasping an object    
-        if reply == 'RobotiqStatus,OK,3,3,1,1,;':
-            return False #return False when the action is done
-        raise RAError()
+
+    def is_gripper_moving(self):
+        reply = self.tcp.send("RobotiqStatus,;")
+        self._validate(reply)
+        if "0,3,1,1" in reply:
+            return True
+        elif "3,3,1,1" in reply or "2,3,1,1" in reply:
+            return False
+        raise RAError(f"Unexpected gripper status: {reply}")
