@@ -55,6 +55,8 @@ See `MoveInCube.py` and `pour_wine.py` for examples of using behavior trees for 
 
 ***Pour Water***
 
+![BehaviourTree](/Tree/pouring_sequence_tree.png)
+
 
 https://github.com/user-attachments/assets/2d68cb86-ef7f-4fea-a627-f24f3eff14fd
 
