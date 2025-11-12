@@ -1,4 +1,4 @@
-# HansRobot-WS
+# ASRC-Automation-Workshop
 
 A Python library for controlling Elfin robot arms via TCP/IP communication, featuring behavior tree integration for complex robotic tasks.
 
