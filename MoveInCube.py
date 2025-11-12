@@ -1,4 +1,5 @@
 # Test move_linear method with py_trees
+from pathlib import Path
 from robot_arm.position import Cartesian
 from robot_arm.robot_arm import RobotArm
 import py_trees
@@ -89,7 +90,7 @@ def create_behavior_tree(ra):
     repeat_open_close = py_trees.decorators.Repeat("RepeatGripper", child=gripper_open_close_sequence, num_success=py_trees.common.ParallelPolicy.SuccessOnAll)
     
     parallel = py_trees.composites.Parallel("ParallelActions", policy=py_trees.common.ParallelPolicy.SuccessOnAll())
-    parallel.add_children([repeat_rectangle, ])
+    parallel.add_children([repeat_rectangle, repeat_open_close])
     
     # Main sequence
     root = py_trees.composites.Sequence("Main", memory=True)
@@ -105,8 +106,11 @@ if __name__ == "__main__":
     ra = RobotArm('169.254.190.254')
     # print(ra.read_cartesian_pos().__dict__)
     ra.set_speed(1.0)
+    # ra = None
     
     tree = create_behavior_tree(ra)
+
+    py_trees.display.render_dot_tree(tree.root,target_directory=Path() / "Tree",name="moveInCube_sequence_tree")
     tree.setup(timeout=15)
     
     while True:

@@ -7,6 +7,7 @@ from py_trees.composites import Sequence, Selector
 from py_trees.behaviours import Success
 from py_trees.common import Status
 from math import inf
+from pathlib import Path
 
 
 class MoveToPosition(py_trees.behaviour.Behaviour):
@@ -89,6 +90,7 @@ class Wait(py_trees.behaviour.Behaviour):
 def main():
     try:
         ra = RobotArm('169.254.190.254')
+        # ra = None
     except:
         pass
     
@@ -108,29 +110,32 @@ def main():
     root = Sequence("PouringSequence", memory=True)
     
     root.add_children([
-        MoveToPosition(ra, positions['zero'], "Move to Zero Position"),
-        # MoveGripper(ra, 0, "Open Gripper"),
-        # MoveGripper(ra, 140, "Open Gripper"),
-        # SetSpeed(ra, normal_speed, "Set Normal Speed"),
-        # MoveToPosition(ra, positions['home'], "Move to Home"),
-        # MoveToPosition(ra, positions['infront_beer'], "Move In Front of Cup"),
-        # MoveToPosition(ra, positions['around_beer'], "Move Around Cup"),
-        # MoveGripper(ra, 0, "Close Gripper"),
-        # MoveToPosition(ra, positions['ready_pour'], "Move to Ready Pour"),
-        # SetSpeed(ra, 0.3, "Set Slow Speed"),
-        # MoveToPosition(ra, positions['pour'], "Pour"),
-        # Wait(2, "Wait for Pouring"),
-        # SetSpeed(ra, normal_speed, "Set Normal Speed"),
-        # MoveToPosition(ra, positions['ready_pour'], "Move to Ready Position"),
-        # MoveToPosition(ra, positions['around_beer'], "Move Around Cup"),
-        # MoveGripper(ra, 140, "Open Gripper"),
-        # MoveToPosition(ra, positions['infront_beer'], "Move In Front of Cup"),
-        # MoveToPosition(ra, positions['home'], "Move to Home"),
-        # MoveToPosition(ra, positions['around_cup'], "Move Around Cup"),
-        # MoveGripper(ra, 0, "Close Gripper"),
-        # MoveToPosition(ra, positions['ready_cup_pour'], "Ready for Next Pour")
+        # MoveToPosition(ra, positions['zero'], "Move to Zero Position"),
+        MoveGripper(ra, 0, "Open Gripper"),
+        MoveGripper(ra, 140, "Open Gripper"),
+        SetSpeed(ra, normal_speed, "Set Normal Speed"),
+        MoveToPosition(ra, positions['home'], "Move to Home"),
+        MoveToPosition(ra, positions['infront_beer'], "Move In Front of Cup"),
+        MoveToPosition(ra, positions['around_beer'], "Move Around Cup"),
+        MoveGripper(ra, 0, "Close Gripper"),
+        MoveToPosition(ra, positions['ready_pour'], "Move to Ready Pour"),
+        SetSpeed(ra, 0.3, "Set Slow Speed"),
+        MoveToPosition(ra, positions['pour'], "Pour"),
+        Wait(2, "Wait for Pouring"),
+        SetSpeed(ra, normal_speed, "Set Normal Speed"),
+        MoveToPosition(ra, positions['ready_pour'], "Move to Ready Position"),
+        MoveToPosition(ra, positions['around_beer'], "Move Around Cup"),
+        MoveGripper(ra, 140, "Open Gripper"),
+        MoveToPosition(ra, positions['infront_beer'], "Move In Front of Cup"),
+        MoveToPosition(ra, positions['home'], "Move to Home"),
+        MoveToPosition(ra, positions['around_cup'], "Move Around Cup"),
+        MoveGripper(ra, 0, "Close Gripper"),
+        MoveToPosition(ra, positions['ready_cup_pour'], "Ready for Next Pour")
         
     ])
+    
+    # save png
+    py_trees.display.render_dot_tree(root, target_directory=Path() / "Tree", name="pouring_sequence_tree")
     
     # root = Repeat( name="Repeat Pouring Sequence", child=root, num_success=inf)
     # Execute behavior tree
