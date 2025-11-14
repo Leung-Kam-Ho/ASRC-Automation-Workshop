@@ -16,7 +16,7 @@ TRACKING_ITEM = "water bottle"
 
 class PositionInfo(BaseModel):
     # return the move direction based on tracking item position
-    position: str = Field(..., pattern="^(|left|right|center|none)$")
+    position: str = Field(..., pattern="^(|left|right|touching|none)$")
 
 
 # Blackboard keys
@@ -66,7 +66,7 @@ class InitializeModel(py_trees.behaviour.Behaviour):
         client = lms.Client("lablab.local:1234")
         self.blackboard.set(BB.CLIENT, client)
         model = client.llm.model("internvl3_5-30b-a3b")
-        # model = client.llm.model('lfm2-vl-1.6b')
+        # model = client.llm.model('internvl3_5-2b')
         self.blackboard.set(BB.MODEL, model)
         self.feedback_message = "Model initialized successfully"
         return Status.SUCCESS
@@ -84,7 +84,7 @@ class InitializeRobotArm(py_trees.behaviour.Behaviour):
 
     def update(self):
         ra = RobotArm("169.254.190.254")
-        ra.set_speed(0.1)
+        ra.set_speed(1)
         self.blackboard.set(BB.ROBOT_ARM, ra)
         self.feedback_message = "Robot arm initialized successfully"
         return Status.SUCCESS
@@ -136,7 +136,16 @@ class CaptureFrame(py_trees.behaviour.Behaviour):
         # frame = cv2.resize(frame, (640, 480))
         # draw two lines to divide the frame into three vertical sections
         height, width, _ = frame.shape
-        
+        frame_size = (frame.shape[1], frame.shape[0])
+        # narrow = width // 6  # 1/6th of the width for narrow sections
+        # for i in range(1, 3):
+        #     cv2.line(
+        #         frame,
+        #         (i * frame_size[0] // 3 , 0),
+        #         (i * frame_size[0] // 3, frame_size[1]),
+        #         (0, 255, 0),
+        #         2,
+        #     )
         # draw a circle at the center of the frame, radius 5 % of width
         cv2.circle(frame, (width // 2, height // 2), int(width * 0.01), (0, 0, 255), -1)
         frame_count = self.blackboard.get(BB.FRAME_COUNT) + 1
@@ -171,16 +180,22 @@ class DetectBottlePosition(py_trees.behaviour.Behaviour):
 
                 chat = lms.Chat()
                 prompt = f"""
-                You are an robotics arm, the view from your camera is provided.
+                You are a robotics arm vision system. The camera view is provided.
                 
-                The center of the camera is the red dot. the {TRACKING_ITEM} need to overlap with the red dot to be picked up successfully. the
-                position is relative to the tip of the robot gripper. if the {TRACKING_ITEM} is in center of the camera view, allowing the gripper to pick it up, it is considered "center". if it is to the left side of the center, it is "left", and if it is to the right side of the center, it is "right".
-                location of the {TRACKING_ITEM} horizontally is divided into three sections: left, center, right.
-                Your task is to identify the horizontal position of the {TRACKING_ITEM} in the image, and respond with one of the following options: "left", "center", "right", or "" (if the {TRACKING_ITEM} is not visible).
+                CRITICAL: The {TRACKING_ITEM} must touch/overlap the RED DOT at the center of the image to be pickable. This is the PRIMARY requirement.
                 
-                ask yourself: is the {TRACKING_ITEM} fully visible in the image? is it between the two black plates?
-
+                Position definitions (from the robot gripper's perspective):
+                - "touching": The {TRACKING_ITEM} is fully visible, touching/overlapping the red dot at the center, AND positioned between the two green lines
+                - "left": The {TRACKING_ITEM} is visible but positioned to the left of the center (left of the red dot)
+                - "right": The {TRACKING_ITEM} is visible but positioned to the right of the center (right of the red dot)
+                - "none": The {TRACKING_ITEM} is not visible in the image
+                
+                IMPORTANT: Do NOT return "touching" unless the {TRACKING_ITEM} is physically touching or overlapping the red dot. Being between the green lines is NOT sufficient - the red dot contact is mandatory.
+                
+                Return only one of: "left", "touching", "right", or "none"
                 """
+                
+                chat.add_system_prompt(prompt)
 
                 image_handle = client.prepare_image("input.jpg")
                 chat.add_user_message(prompt, images=[image_handle])
