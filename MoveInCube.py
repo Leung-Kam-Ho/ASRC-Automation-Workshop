@@ -153,20 +153,20 @@ def create_behavior_tree(ra: RobotArm):
     # Main sequence: initial gripper operations, then go into repeating parallel actions
     root = py_trees.composites.Sequence("Main", memory=True)
     root.add_children([
-        MoveLinear("Init Position", ra, Cartesian(0, -210, 0, 0, 0, 90), relative=False),
-        MoveGripper(ra, 130, "OpenGripper"),
-        MoveGripper(ra, 0, "CloseGripper"),
-        MoveGripper(ra, 130, "OpenGripper"),
+        MoveLinear("Init Position", ra, Cartesian(0, 0, 0, 0, 0, 0), relative=False),
+        # MoveGripper(ra, 130, "OpenGripper"),
+        # MoveGripper(ra, 0, "CloseGripper"),
+        # MoveGripper(ra, 130, "OpenGripper"),
         # MoveJoint("Look at table", ra, JPosition(0, 0, 0, 0, -25, 0), relative=True),
         # repeat_rectangle,  # start repeating the relative cube path
-        parallel
+        # parallel
     ])
 
     return py_trees.trees.BehaviourTree(root)
 
 
 if __name__ == "__main__":
-    ra = RobotArm('169.254.190.254')
+    ra = RobotArm('192.168.10.228')
     ra.set_speed(.4)
 
     tree = create_behavior_tree(ra)
