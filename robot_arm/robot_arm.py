@@ -146,6 +146,14 @@ class RobotArm:
         msg = f"SetRobotiq,{position},{speed},{force},;"
         reply = self.tcp.send(msg)
         self._validate(reply)
+    
+    def read_gripper_pos(self):
+        reply = self.tcp.send("ReadRobotiqPosition,;")
+        self._validate(reply)
+        values = reply.split(',')
+        if len(values) < 3:
+            raise RAError("Invalid ReadRobotiqPosition response")
+        return int(values[2])
 
     def reset_gripper(self):
         reply = self.tcp.send("RobotIQReset,;")
