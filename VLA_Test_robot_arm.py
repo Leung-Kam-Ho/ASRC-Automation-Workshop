@@ -5,6 +5,7 @@ from robot_arm.robot_arm import RobotArm
 from transformers import AutoModelForVision2Seq, AutoProcessor
 from PIL import Image
 import torch
+from utils.get_image_client import 
 
 DEVICE = "mps"
 # robot.act(action, ...)
