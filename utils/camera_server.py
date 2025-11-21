@@ -5,7 +5,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 class CameraHandler(BaseHTTPRequestHandler):
     def get_image(self):
         # Capture image from camera
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture(1)
         ret, frame = cap.read()
         cap.release()
         if ret:
@@ -33,7 +33,7 @@ class CameraHandler(BaseHTTPRequestHandler):
             self.send_error(404)
 
 
-def run_server(port=8000):
+def run_server(port=8001):
     server_address = ("0.0.0.0", port)
     httpd = HTTPServer(server_address, CameraHandler)
     print(f"Camera server running on port {port}")

@@ -8,7 +8,7 @@ def main():
         "--ip", default="localhost", help="IP address of the camera server"
     )
     parser.add_argument(
-        "--port", type=int, default=8000, help="Port of the camera server"
+        "--port", type=int, default=8001, help="Port of the camera server"
     )
     args = parser.parse_args()
 
