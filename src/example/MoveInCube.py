@@ -4,7 +4,7 @@ from robot_arm.position import Cartesian, JPosition
 from robot_arm.robot_arm import RobotArm
 import py_trees
 import time
-from robot_action_node import MoveJoint, MoveLinear, MoveGripper
+from src.example.robot_action_node import MoveJoint, MoveLinear, MoveGripper
 
 
 def create_behavior_tree(ra: RobotArm):

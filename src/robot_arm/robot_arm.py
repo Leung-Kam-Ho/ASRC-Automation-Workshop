@@ -1,10 +1,13 @@
 from .tcp import Tcp
 from .ra_error import *
-from .position import Cartesian
+from .position import Cartesian, JPosition
+
 
 class RobotArm:
-    def __init__(self, host):
+    def __init__(self, host, base_offset=0):
         self.tcp = Tcp(host)
+        self.base_offset = base_offset  # the mount offset
+        self.Init_pose = JPosition(self.base_offset, 40, 130, 0, 90, 0)
 
     def _validate(self, reply):
         values = reply.split(',')
@@ -104,7 +107,7 @@ class RobotArm:
         reply = self.tcp.send("ReadAcsActualPos,0,;")
         self._validate(reply)
         values = reply.split(',')
-        return [float(v) for v in values[2:8]]
+        return JPosition(*[float(v) for v in values[2:8]])
 
     def read_cartesian_pos(self):
         reply = self.tcp.send("ReadPcsActualPos,0,;")

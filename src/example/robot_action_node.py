@@ -47,7 +47,7 @@ class MoveJoint(py_trees.behaviour.Behaviour):
             target_jpos = JPosition(*target)
             self.robot_arm.move_joint(target_jpos)
             self.started = True
-            self.feedback_message = f"Moving joints -> target {target_jpos}"
+            self.feedback_message = f"Moving joints -> target {target_jpos.__dict__}"
             return py_trees.common.Status.RUNNING
 
         # wait until the robot arm finished moving
@@ -85,7 +85,7 @@ class MoveLinear(py_trees.behaviour.Behaviour):
                 target = self.target_delta
             self.robot_arm.move_linear(target)
             self.started = True
-            self.feedback_message = f"Moving to {self.name} -> target {target}"
+            self.feedback_message = f"Moving to {self.name} -> target {target.__dict__}"
             return py_trees.common.Status.RUNNING
 
         # Wait until the robot arm is not moving
