@@ -55,13 +55,28 @@ class RobotArm:
         reply = self.tcp.send(msg)
         self._validate(reply)
 
+    def move_joint_B(self, jPos):
+        msg = f"MoveBJ,0,{jPos.j1},{jPos.j2},{jPos.j3},{jPos.j4},{jPos.j5},{jPos.j6},;"
+        reply = self.tcp.send(msg)
+        self._validate(reply)
+
     def move_joint(self, jPos):
         msg = f"MoveJ,0,{jPos.j1},{jPos.j2},{jPos.j3},{jPos.j4},{jPos.j5},{jPos.j6},;"
         reply = self.tcp.send(msg)
         self._validate(reply)
 
+    def move_velocity_linear(self, cartesian: Cartesian):
+        msg = f"MoveV,0,{cartesian.x},{cartesian.y},{cartesian.z},{cartesian.rx},{cartesian.ry},{cartesian.rz},;"
+        reply = self.tcp.send(msg)
+        self._validate(reply)
+
     def move_linear(self, cartesian: Cartesian):
         msg = f"MoveL,0,{cartesian.x},{cartesian.y},{cartesian.z},{cartesian.rx},{cartesian.ry},{cartesian.rz},;"
+        reply = self.tcp.send(msg)
+        self._validate(reply)
+
+    def move_linear_B(self, cartesian: Cartesian):
+        msg = f"MoveB,0,{cartesian.x},{cartesian.y},{cartesian.z},{cartesian.rx},{cartesian.ry},{cartesian.rz},;"
         reply = self.tcp.send(msg)
         self._validate(reply)
 
