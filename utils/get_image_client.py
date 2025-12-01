@@ -1,7 +1,7 @@
 import urllib.request
 
 
-def get_image(ip="localhost", port=8000):
+def get_image(ip="localhost", port=8001):
     url = f"http://{ip}:{port}/"
     try:
         with urllib.request.urlopen(url) as response:

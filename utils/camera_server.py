@@ -5,7 +5,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 class CameraHandler(BaseHTTPRequestHandler):
     def get_image(self):
         # Capture image from camera
-        cap = cv2.VideoCapture(1)
+        cap = cv2.VideoCapture(0)
         ret, frame = cap.read()
         cap.release()
         if ret:
