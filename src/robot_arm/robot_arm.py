@@ -7,7 +7,7 @@ class RobotArm:
     def __init__(self, host, base_offset=0):
         self.tcp = Tcp(host)
         self.base_offset = base_offset  # the mount offset
-        self.Init_pose = JPosition(self.base_offset, 40, 130, 0, 90, 0)
+        self.Init_pose = JPosition(self.base_offset, -40, -130, 0, -90, 0)
 
     def _validate(self, reply):
         values = reply.split(',')
