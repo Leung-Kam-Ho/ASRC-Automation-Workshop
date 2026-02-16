@@ -5,8 +5,8 @@ from robot_arm.position import Cartesian
 
 
 def main():
-    # ra = RobotArm(host="192.168.1.64", base_offset=-90)
-    ra = RobotArm(host="192.168.1.48", base_offset=60)
+    ra = RobotArm(host="192.168.1.64", base_offset=0)
+    # ra = RobotArm(host="192.168.1.48", base_offset=60)
 
 
     # go to init pose
