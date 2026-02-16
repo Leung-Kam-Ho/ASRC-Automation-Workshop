@@ -41,7 +41,7 @@ def create_behavior_tree(ra: RobotArm):
     repeat_open_close = py_trees.decorators.Repeat("RepeatGripper", child=gripper_open_close_sequence, num_success=None)
 
     parallel = py_trees.composites.Parallel("ParallelActions", policy=py_trees.common.ParallelPolicy.SuccessOnAll())
-    parallel.add_children([repeat_rectangle, ])
+    parallel.add_children([repeat_rectangle, repeat_open_close])
 
     # Main sequence: initial gripper operations, then go into repeating parallel actions
     root = py_trees.composites.Sequence("Main", memory=True)
