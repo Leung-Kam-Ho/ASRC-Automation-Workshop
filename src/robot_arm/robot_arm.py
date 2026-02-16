@@ -10,6 +10,7 @@ class RobotArm:
         self.Init_pose = JPosition(self.base_offset, -40, -130, 0, -90, 0)
         self.init_cartesian = self.read_cartesian_pos()  # read initial cartesian position for later use in relative moves
         print(f"RobotArm initialized at cartesian position: {self.init_cartesian.__dict__}")
+        print(f"RobotArm initialized at joint position: {self.read_joint_pos().__dict__}")
 
     def _validate(self, reply):
         values = reply.split(',')

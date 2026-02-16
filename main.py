@@ -5,10 +5,10 @@ from robot_arm.position import Cartesian
 
 
 def main():
-    ra = RobotArm(host="192.168.1.64", base_offset=0)
-    # ra = RobotArm(host="192.168.1.48", base_offset=60)
+    # ra = RobotArm(host="192.168.1.64", base_offset=0)
+    ra = RobotArm(host="192.168.1.49", base_offset=-30)
 
-    ra.set_speed(1) # set speed to 100mm/s
+    ra.set_speed(.1) # set speed to 100mm/s
     # go to init pose
     ra.move_joint(ra.Init_pose)
 
@@ -24,8 +24,8 @@ def main():
 
     # move 100mm in x direction
     new_cartesian = Cartesian(
-        x=cartesian.x + 500,
-        y=cartesian.y - 100,
+        x=cartesian.x + 100,
+        y=cartesian.y,
         z=cartesian.z,
         rx=cartesian.rx,
         ry=cartesian.ry,
@@ -33,7 +33,7 @@ def main():
     )
 
     # move to new position
-    ra.move_linear(cartesian=new_cartesian)
+    ra.move_linear_B(cartesian=new_cartesian)
 
 
     # wait until reach

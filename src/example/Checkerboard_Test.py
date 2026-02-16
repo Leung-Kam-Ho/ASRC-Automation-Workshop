@@ -7,9 +7,9 @@ import time
 from example.robot_action_node import MoveJoint, MoveLinear, MoveGripper
 
 class CheckerboardSize:
-    WIDTH = 400
-    HEIGHT = 400
-    Robot_X = 110  # distance from the robot to the center of the checkerboard in x direction
+    WIDTH = 375
+    HEIGHT = 375
+    Robot_X = 125  # distance from the robot to the center of the checkerboard in x direction
 
 def create_behavior_tree(ra: RobotArm):
     # Assume you are at the bottom center of the checkerboard
@@ -46,7 +46,7 @@ def create_behavior_tree(ra: RobotArm):
     # Main sequence: initial gripper operations, then go into repeating parallel actions
     root = py_trees.composites.Sequence("Main", memory=True)
     root.add_children([
-        MoveLinear("Init Position", ra, Cartesian(0, 0, 0, 0, 0, 0), relative=False),
+        MoveJoint("Init Position", ra, ra.Init_pose, relative=False),
         # MoveGripper(ra, 130, "OpenGripper"),
         # MoveGripper(ra, 0, "CloseGripper"),
         # MoveGripper(ra, 130, "OpenGripper"),
@@ -59,7 +59,8 @@ def create_behavior_tree(ra: RobotArm):
 
 
 if __name__ == "__main__":
-    ra = RobotArm('192.168.1.64')
+    # ra = RobotArm('192.168.1.64')  # Arm 1
+    ra = RobotArm('192.168.1.49', base_offset=-30)  # Arm 2
     ra.set_speed(.4)
 
     tree = create_behavior_tree(ra)
