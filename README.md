@@ -17,6 +17,7 @@ This project uses `uv` for dependency management. Install dependencies with:
 
 ```bash
 uv sync
+uv pip install .
 ```
 
 ## Usage
