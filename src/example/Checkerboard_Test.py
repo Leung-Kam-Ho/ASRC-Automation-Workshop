@@ -47,11 +47,6 @@ def create_behavior_tree(ra: RobotArm):
     root = py_trees.composites.Sequence("Main", memory=True)
     root.add_children([
         MoveJoint("Init Position", ra, ra.Init_pose, relative=False),
-        # MoveGripper(ra, 130, "OpenGripper"),
-        # MoveGripper(ra, 0, "CloseGripper"),
-        # MoveGripper(ra, 130, "OpenGripper"),
-        # MoveJoint("Look at table", ra, JPosition(0, 0, 0, 0, -25, 0), relative=True),
-        # repeat_rectangle,  # start repeating the relative cube path
         parallel
     ])
 
