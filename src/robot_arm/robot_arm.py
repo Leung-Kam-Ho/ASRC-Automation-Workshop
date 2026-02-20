@@ -58,6 +58,17 @@ class RobotArm:
         reply = self.tcp.send(msg)
         self._validate(reply)
 
+    def set_tool_coordinate(self, mode : int):
+        """
+        SetToolCoordinateMotion - Enable tool coordinate motion:
+        SetToolCoordinateMotion,rbtID,1,;
+        (1 = tool, 0 = base)
+        """
+        msg = f"SetToolCoordinateMotion,0,{mode},;"
+        reply = self.tcp.send(msg)
+        self._validate(reply)
+
+
     def move_joint_B(self, jPos):
         msg = f"MoveBJ,0,{jPos.j1},{jPos.j2},{jPos.j3},{jPos.j4},{jPos.j5},{jPos.j6},;"
         reply = self.tcp.send(msg)
